@@ -1,0 +1,21 @@
+# /etc/sudoers.d/fedora-manifesto.example
+#
+# NON copiare questo file direttamente in /etc/sudoers.d/! Prima:
+#   1. Sostituisci "tuoutente" con il tuo username reale
+#   2. Installa fedora-manifesto-etc-snapshot.sh in /usr/local/sbin/,
+#      di proprietà di root, permessi 755, non scrivibile dall'utente normale:
+#        sudo cp fedora-manifesto-etc-snapshot.sh /usr/local/sbin/
+#        sudo chown root:root /usr/local/sbin/fedora-manifesto-etc-snapshot.sh
+#        sudo chmod 755 /usr/local/sbin/fedora-manifesto-etc-snapshot.sh
+#   3. Aggiungi questa riga con: sudo visudo -f /etc/sudoers.d/fedora-manifesto
+#      (mai editare /etc/sudoers direttamente, e mai con un editor generico:
+#      visudo valida la sintassi prima di salvare)
+#
+# Questa regola concede l'esecuzione SENZA PASSWORD solo di quell'unico
+# script, per path assoluto esatto, senza parametri: lo script stesso non
+# accetta input dall'utente (determina da sé sorgente e destinazione tramite
+# $SUDO_USER), quindi non c'è modo di sfruttarlo per leggere o scrivere
+# altrove.
+
+tuoutente ALL=(root) NOPASSWD: /usr/local/sbin/fedora-manifesto-etc-snapshot.sh
+tuoutente ALL=(root) NOPASSWD: /usr/bin/dnf install -y git

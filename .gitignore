@@ -1,0 +1,15 @@
+# Questo repository contiene solo gli SCRIPT dello strumento, non i tuoi
+# dati personali. Se cloni questo repo per usarlo, la tua cartella
+# manifest/ (generata da aggiorna-manifesto.sh) NON deve mai essere
+# committata qui: contiene lo stato reale del tuo sistema, potenzialmente
+# con dati sensibili (es. password Wi-Fi in chiaro nelle connessioni
+# NetworkManager tracciate).
+#
+# Tieni manifest/ in un repository separato e privato, mai in questo.
+
+manifest/
+snapshots/
+diff-report-*/
+*.tar.gz
+*.7z
+*.gpg
