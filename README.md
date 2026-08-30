@@ -56,3 +56,14 @@ cifra quel file prima — vedi la sezione dedicata nel vademecum per usare
 ## Licenza
 
 GNU General Public License v3.0 — vedi [LICENSE](LICENSE).
+
+## Nota sullo sviluppo
+
+Questo progetto è stato sviluppato con l'assistenza di un assistente IA
+(Claude, Anthropic), ma ogni componente è stato progettato, testato e
+rivisto manualmente: incluso un vero ciclo di test end-to-end su una VM
+clonata (installazione pacchetti, Flatpak, impostazioni desktop, bashrc),
+con bug reali scoperti e corretti nel processo (gestione chiavi GPG dei
+repository, conflitti tra pacchetti, comportamento dei menu di Midnight
+Commander). Il codice è compreso e mantenuto attivamente, non generato e
+pubblicato senza revisione.
