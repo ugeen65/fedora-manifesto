@@ -17,6 +17,17 @@ set -uo pipefail
 
 MANIFEST_DIR="${1:?Indica il percorso della cartella manifest da cui ripristinare}"
 
+# -----------------------------------------------------------------------------
+# Repository esterni opzionali (dotfiles gestiti con Stow, backup del bashrc
+# separato). Se usi fedora-manifesto insieme a repository simili, imposta qui
+# gli URL: lo script li clonerà e li applicherà automaticamente. Lascia vuoto
+# per saltare questo passaggio.
+# -----------------------------------------------------------------------------
+DOTFILES_REPO_URL=""
+DOTFILES_STOW_PACKAGES=""
+BASHRC_REPO_URL=""
+
+
 if [[ ! -d "$MANIFEST_DIR" ]]; then
     echo "Errore: la cartella '$MANIFEST_DIR' non esiste." >&2
     exit 1
@@ -190,6 +201,52 @@ if [[ -f "$MANIFEST_DIR/bashrc" ]]; then
     echo
 fi
 
+# -----------------------------------------------------------------------------
+# 7. Repository esterni opzionali: dotfiles gestiti con Stow, e/o un
+#    repository dedicato per il bashrc, se configurati nelle variabili in
+#    cima allo script.
+# -----------------------------------------------------------------------------
+if [[ -n "$DOTFILES_REPO_URL" ]]; then
+    echo "--- Dotfiles esterni (Stow) ---"
+    if [[ -d "$HOME/dotfiles/.git" ]]; then
+        echo "  ~/dotfiles esiste già, salto la clonazione."
+    else
+        read -p "  Clonare $DOTFILES_REPO_URL in ~/dotfiles? [y/N] " RISP
+        if [[ "$RISP" == "y" || "$RISP" == "Y" ]]; then
+            git clone "$DOTFILES_REPO_URL" "$HOME/dotfiles"
+        fi
+    fi
+    if [[ -d "$HOME/dotfiles" ]] && command -v stow >/dev/null 2>&1 && [[ -n "$DOTFILES_STOW_PACKAGES" ]]; then
+        read -p "  Applicare i symlink Stow ($DOTFILES_STOW_PACKAGES)? [y/N] " RISP
+        if [[ "$RISP" == "y" || "$RISP" == "Y" ]]; then
+            (cd "$HOME/dotfiles" && stow $DOTFILES_STOW_PACKAGES)
+            echo "  Dotfiles collegati."
+        fi
+    fi
+    echo
+fi
+
+if [[ -n "$BASHRC_REPO_URL" ]]; then
+    echo "--- Repository dedicato del bashrc ---"
+    if [[ -d "$HOME/repo-bashrc/.git" ]]; then
+        echo "  ~/repo-bashrc esiste già, salto la clonazione."
+    else
+        read -p "  Clonare $BASHRC_REPO_URL in ~/repo-bashrc? [y/N] " RISP
+        if [[ "$RISP" == "y" || "$RISP" == "Y" ]]; then
+            git clone "$BASHRC_REPO_URL" "$HOME/repo-bashrc"
+        fi
+    fi
+    if [[ -f "$HOME/repo-bashrc/.bashrc" ]]; then
+        read -p "  Usare il .bashrc di questo repository al posto di quello attuale? [y/N] " RISP
+        if [[ "$RISP" == "y" || "$RISP" == "Y" ]]; then
+            cp "$HOME/.bashrc" "$HOME/.bashrc.prima-del-ripristino-esterno" 2>/dev/null
+            cp "$HOME/repo-bashrc/.bashrc" "$HOME/.bashrc"
+            echo "  Fatto. Lancia 'source ~/.bashrc' per applicarlo subito."
+        fi
+    fi
+    echo
+fi
+
 echo "==========================================================="
 echo "  RIPRISTINO GUIDATO COMPLETATO"
 echo "  Ricorda di controllare manualmente:"
@@ -204,3 +261,4 @@ echo "  - Conflitti tra pacchetti simili (es. dizionari hunspell-en vs"
 echo "    varianti regionali): risolvi rimuovendo il pacchetto generico"
 echo "    in conflitto, poi rilancia questo script."
 echo "==========================================================="
+
